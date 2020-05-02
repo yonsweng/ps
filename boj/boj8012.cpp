@@ -1,4 +1,3 @@
-// BOJ 8012 Byteasar the Travelling Salesman https://www.acmicpc.net/problem/8012
 #include <iostream>
 #include <vector>
 

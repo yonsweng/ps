@@ -1,9 +1,8 @@
-// BOJ 8012 Byteasar the Travelling Salesman https://www.acmicpc.net/problem/8012
 #include <iostream>
 #include <vector>
 
-#define MAXN 30001
-#define MAX_PSIZE 15
+#define MAXN 100001
+#define MAX_PSIZE 17
 
 using namespace std;
 
@@ -26,7 +25,7 @@ void compute_p() {
             p[i][j] = p[p[i][j - 1]][j - 1];
 }
 
-int find_lca(int a, int b) {
+int lca(int a, int b) {
     // Make a have a higher depth
     if (d[a] < d[b]) swap(a, b);
 
@@ -62,17 +61,27 @@ int main() {
 
     compute_p();
 
-    int m, x, y, total = 0;
+    int m;
     cin >> m;
-    cin >> x;
-    for (int i = 1; i < m; i++) {
-        cin >> y;
-        int lca = find_lca(x, y);
-        if (lca != -1) total += d[x] + d[y] - 2 * d[lca];
-        x = y;
-    }
+    for (int i = 0; i < m; i++) {
+        int r, u, v;
+        cin >> r >> u >> v;
 
-    cout << total;
+        int ru = lca(r, u), rv = lca(r, v), uv = lca(u, v);
+        int ans;
+        if (ru == rv)
+            ans = uv;
+        else if(rv == uv)
+            ans = ru;
+        else if(uv == ru)
+            ans = rv;
+        else if(ru == u)
+            ans = u;
+        else
+            ans = v;
+
+        cout << ans << '\n';
+    }
 
     return 0;
 }
