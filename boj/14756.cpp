@@ -91,7 +91,8 @@ int main() {
 
     vector<cpx> T[100], P[100];
 
-    int n, l, m, W;
+    int n, l, m;
+    long long W;
     cin >> n >> l >> m >> W;
 
     for(int i=0; i<m; i++) {
@@ -112,7 +113,7 @@ int main() {
             P[i].push_back(tmp);  // telescope
         }
     }
-    
+
     for(int i=0; i<m; i++)
         reverse(P[i].begin(), P[i].end());  // reverse telescope
 
