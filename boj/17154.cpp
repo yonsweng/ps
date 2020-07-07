@@ -1,54 +1,57 @@
 #include <iostream>
 #include <vector>
+#include <set>
+#include <queue>
 #include <algorithm>
-#include <stack>
 
 using namespace std;
 
-vector<vector<int>> adj;
-bool visited[500001], visited2[500001];
-bool in_cycle[500001];
+vector<set<int>> adj;
+vector<bool> visited;
+vector<int> leaves;
 vector<pair<int, int>> ans;
-stack<int> st;
-bool in_st[500001];
 
-int search_cycle(int now, int prev) {
-    
-}
-
-// return now is in cycle
-bool put_sign_on_cycle(int now, int prev) {
-    bool is_cycle = false;
-    visited2[now] = true;
-    for(int to : adj[now]) {
-        if(to == prev) continue;
-
-        if(visited2[to]) {
-            is_cycle = true;
-        } else {
-            if(put_sign_on_cycle(to, now)) {
-                is_cycle = true;
-            } else if(in_cycle[now]) {
-                ans.emplace_back(now, to);
+bool isCycle(int prev, int curr) {
+    bool cycle = false;
+    visited[curr] = true;
+    if(adj[curr].size() == 1) {  // curr is leaf
+        leaves.push_back(curr);
+    }
+    for(int next : adj[curr]) {
+        if(next != prev) {
+            if(visited[next]) {
+                cycle = true;
+            } else {
+                if(isCycle(curr, next)) {
+                    cycle = true;
+                }
             }
         }
     }
-    return is_cycle;
+    return cycle;
 }
 
-void put_sign_on_leaf(int now, int prev) {
-    visited2[now] = true;
-    if(adj[now].size() == 1) {  // leaf
-        ans.emplace_back(now, adj[now][0]);
-        if(!visited2[adj[now][0]])
-            put_sign_on_leaf(adj[now][0], now);
-    } else {
-        for(int to : adj[now]) {
-            if(to == prev) continue;
-
-            if(!visited2[to])
-                put_sign_on_leaf(to, now);
+void removeLeaves() {
+    for(int i=0; i<leaves.size(); i++) {
+        int leaf = leaves[i];
+        int next = *adj[leaf].begin();
+        adj[next].erase(leaf);
+        if(adj[next].size() == 1) {
+            leaves.push_back(next);
         }
+    }
+    for(int leaf : leaves) {
+        int next = *adj[leaf].begin();
+        if(adj[next].size() > 1) {
+            ans.emplace_back(next, leaf);
+        }
+    }
+}
+
+void putSignsOnLeaves() {
+    for(int leaf : leaves) {
+        int next = *adj[leaf].begin();
+        ans.emplace_back(leaf, next);
     }
 }
 
@@ -58,27 +61,25 @@ int main() {
 
     int n, m;
     cin >> n >> m;
+
     adj.resize(n+1);
+    visited.resize(n+1);
+
     for(int i=0; i<m; i++) {
         int v, w;
         cin >> v >> w;
-        adj[v].push_back(w);
-        adj[w].push_back(v);
+        adj[v].insert(w);
+        adj[w].insert(v);
     }
 
     for(int i=1; i<=n; i++) {
-        if(visited[i]) continue;
-
-        while(!st.empty()) st.pop();
-
-        // search cycle
-        int cycle = search_cycle(i, 0);
-
-        if(cycle) {
-            // start in cycle
-            put_sign_on_cycle(cycle, 0);
-        } else {
-            put_sign_on_leaf(i, 0);
+        if(!visited[i]) {
+            if(isCycle(0, i)) {  // not tree
+                removeLeaves();
+            } else {  // tree
+                putSignsOnLeaves();
+            }
+            leaves.clear();
         }
     }
 
