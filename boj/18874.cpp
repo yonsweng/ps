@@ -7,98 +7,123 @@ using namespace std;
 
 int N;
 
-class PST {
-    struct Node {
-        int left, right;  // [left, right]
-        int sum;
-        Node *lchild, *rchild;
+template<typename T>
+class SegTree
+{
+private:
+    int count;
+    std::vector<T> tree;
+    std::vector<T> lazy;
 
-        Node(int left, int right) : left(left), right(right), sum(0), lchild(nullptr), rchild(nullptr) {}
-    };
+    T initialize(int index, int start, int end, const std::vector<T>& original)
+    {
+        if (start == end)
+            return tree[index] = original[start];
+        
+        int mid = (start + end) / 2;
+        T left = initialize(index * 2, start, mid, original);
+        T right = initialize(index * 2 + 1, mid + 1, end, original);
 
-    Node *root[MAXN + 1];  // root[x]: tree of 0 ~ x-1
-    vector<Node *> node_ptrs;
-
-    Node *update_(Node *this_node, int y, bool is_new) {
-        int left = this_node->left;
-        int right = this_node->right;
-        int mid = (left + right) / 2;
-
-        Node *new_node;
-        if (!is_new) {
-            new_node = new Node(left, right);
-            node_ptrs.push_back(new_node);
-            new_node->lchild = this_node->lchild;
-            new_node->rchild = this_node->rchild;
-        } else
-            new_node = this_node;
-
-        // Leaf node
-        if (left == right) {
-            new_node->sum = this_node->sum + 1;
-            return new_node;
-        }
-
-        if (y <= mid) {  // Left
-            if (!new_node->lchild) {
-                new_node->lchild = new Node(left, mid);
-                node_ptrs.push_back(new_node->lchild);
-                update_(new_node->lchild, y, true);
-            } else
-                new_node->lchild = update_(new_node->lchild, y, false);
-        } else {  // Right
-            if (!new_node->rchild) {
-                new_node->rchild = new Node(mid + 1, right);
-                node_ptrs.push_back(new_node->rchild);
-                update_(new_node->rchild, y, true);
-            } else
-                new_node->rchild = update_(new_node->rchild, y, false);
-        }
-
-        int sum = 0;
-        if (new_node->lchild) sum += new_node->lchild->sum;
-        if (new_node->rchild) sum += new_node->rchild->sum;
-        new_node->sum = sum;
-        return new_node;
+        return tree[index] = (left + right);
     }
 
-    int get_sum_(Node *here, int b, int t) {
-        if (!here || t < here->left || here->right < b)
+    void propagate(int index, int start, int end)
+    {
+        if (lazy[index] != 0)
+        {
+            tree[index] += lazy[index] * (end - start + 1);
+
+            if (start != end)
+            {
+                lazy[index * 2] += lazy[index];
+                lazy[index * 2 + 1] += lazy[index];
+            }
+
+            lazy[index] = 0;
+        }
+    }
+
+    T query(int index, int nodeStart, int nodeEnd, int reqStart, int reqEnd)
+    {
+        propagate(index, nodeStart, nodeEnd);
+
+        int nodeMid = (nodeStart + nodeEnd) / 2;
+
+        if (nodeStart > reqEnd || nodeEnd < reqStart)
             return 0;
-        else if (b <= here->left && here->right <= t)
-            return here->sum;
+
+        else if (nodeStart >= reqStart && nodeEnd <= reqEnd)
+            return tree[index];
+        
         else
-            return get_sum_(here->lchild, b, t) + get_sum_(here->rchild, b, t);
+        {
+            T left = query(index * 2, nodeStart, nodeMid, reqStart, reqEnd);
+            T right = query(index * 2 + 1, nodeMid + 1, nodeEnd, reqStart, reqEnd);
+            return left + right;
+        }
     }
 
+    void update(T add, int dataStart, int dataEnd, int treeIndex, int treeStart, int treeEnd)
+    {
+        propagate(treeIndex, treeStart, treeEnd);
+
+        int treeMid = (treeStart + treeEnd) / 2;
+
+        if (dataEnd < treeStart || treeEnd < dataStart)
+            return;
+        
+        if (dataStart <= treeStart && treeEnd <= dataEnd)
+        {
+            tree[treeIndex] += add * (treeEnd - treeStart + 1);
+            if (treeStart != treeEnd)
+            {
+                lazy[treeIndex * 2] += add;
+                lazy[treeIndex * 2 + 1] += add;
+            }
+            return;
+        }
+
+        update(add, dataStart, dataEnd, treeIndex * 2, treeStart, treeMid);
+        update(add, dataStart, dataEnd, treeIndex * 2 + 1, treeMid + 1, treeEnd);
+
+        tree[treeIndex] = tree[treeIndex * 2] + tree[treeIndex * 2 + 1];
+    }
+    
 public:
-    PST() {
-        root[0] = new Node(0, N);
-        node_ptrs.push_back(root[0]);
-        for (int i = 1; i <= N; i++) root[i] = nullptr;
+    SegTree(const std::vector<T>& original)
+    {
+        count = (int)original.size();
+        int treeHeight = (int)ceil(log2(count));
+        int vecSize = (1 << (treeHeight + 1));
+        tree.resize(vecSize);
+        lazy.resize(vecSize);
+        initialize(1, 0, count - 1, original);
     }
 
-    void update(int xi, int y) {
-        if (!root[xi + 1])
-            root[xi + 1] = update_(root[xi], y, false);
-        else
-            update_(root[xi + 1], y, true);
+    SegTree(int size)
+    {
+        count = size;
+        int treeHeight = (int)ceil(log2(count));
+        int vecSize = (1 << (treeHeight + 1));
+        tree.resize(vecSize);
+        lazy.resize(vecSize);
     }
 
-    // Sum of 0 ~ x-1
-    int get_sum(int xi, int b, int t) {
-        return get_sum_(root[xi + 1], b, t);
+    T query(int start, int end)
+    {
+        return query(1, 0, count - 1, start, end);
     }
 
-    ~PST() {
-        for (Node *p : node_ptrs) delete p;
+    void update(T add, int start, int end)
+    {
+        update(add, start, end, 1, 0, count - 1);
     }
 };
 
 vector<int> idx[MAXN + 1];
 
 int main() {
-    // freopen("input/1.in", "r", stdin);
+    freopen("input/1.in", "r", stdin);
     ios::sync_with_stdio(false), cin.tie(nullptr);
 
     cin >> N;
@@ -109,21 +134,16 @@ int main() {
         idx[A[i]].push_back(i);
     }
 
-    PST pst;
+    SegTree<int> st(N + 1);
 
-    for(int j=0; j<N; j++) {
-        if(idx[j].empty()) {
-            pst.update(j, 0);
-        }
-        for(int k : idx[j])
-            pst.update(j, k);
-    }
+    st.update(1, 1, N);
 
     long long sum = 0;
     cout << 0 << '\n';
     for(int j=1; j<N; j++) {
         for(int k : idx[j-1]) {
-            sum += (k - 1) - pst.get_sum(j-1, 1, k-1);
+            st.update(-1, k, k);
+            sum += st.query(1, k-1);
         }
         cout << sum << '\n';
     }
