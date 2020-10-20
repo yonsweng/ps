@@ -39,7 +39,7 @@ public:
 int main() {
     vector<int> v = {1, 2, 3, 4, 5, 6, 7};
     SegTree<int> st(0, 6);
-    for(int i=0; i<v.size(); i++) {
+    for(int i=0; i<(int)v.size(); i++) {
         st.update(i, v[i]);
     }
     cout << st.query(0, 3) << endl;
