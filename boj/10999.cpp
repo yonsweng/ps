@@ -1,25 +1,85 @@
-#include <cstdio>
+#include <bits/stdc++.h>
 
-int tree[4000000], prop[4000000];
+using namespace std;
 
+template<typename T> class SegTree {
+    int MIN, MAX;
+    vector<T> node, lazy;
 
+    T init(int node_num, int node_s, int node_e, const vector<T>& data) {
+        if (node_s == node_e)
+            return node[node_num] = data[node_s];
+        int node_m = (node_s + node_e) / 2;
+        T left = init(node_num * 2, node_s, node_m, data);
+        T right = init(node_num * 2 + 1, node_m + 1, node_e, data);
+        return node[node_num] = left + right;
+    }
+    void prop(int node_num, int node_s, int node_e) {
+        node[node_num] += lazy[node_num] * (node_e - node_s + 1);
+        if (node_s != node_e) {
+            lazy[node_num * 2] += lazy[node_num];
+            lazy[node_num * 2 + 1] += lazy[node_num];
+        }
+        lazy[node_num] = 0;
+    }
+    T query(int node_num, int node_s, int node_e, int req_s, int req_e) {
+        prop(node_num, node_s, node_e);
+        if (req_e < node_s || node_e < req_s)
+            return 0;
+        if (req_s <= node_s && node_e <= req_e)
+            return node[node_num];
+        int node_m = (node_s + node_e) / 2;
+        T left = query(node_num * 2, node_s, node_m, req_s, req_e);
+        T right = query(node_num * 2 + 1, node_m + 1, node_e, req_s, req_e);
+        return left + right;
+    }
+    void update(int node_num, int node_s, int node_e, int req_s, int req_e, T value) {
+        prop(node_num, node_s, node_e);
+        if (req_e < node_s || node_e < req_s)
+            return;
+        if (req_s <= node_s && node_e <= req_e) {
+            lazy[node_num] += value;
+            prop(node_num, node_s, node_e);
+            return;
+        }
+        int node_m = (node_s + node_e) / 2;
+        update(node_num * 2, node_s, node_m, req_s, req_e, value);
+        update(node_num * 2 + 1, node_m + 1, node_e, req_s, req_e, value);
+        node[node_num] = node[node_num * 2] + node[node_num * 2 + 1];
+    }
+public:
+    SegTree(int MIN, int MAX) : MIN(MIN), MAX(MAX) {
+        node.resize(4 * (MAX - MIN));
+        lazy.resize(4 * (MAX - MIN));
+    }
+    SegTree(const vector<T>& data) : MIN(0), MAX(int(data.size()) - 1) {
+        node.resize(4 * (MAX - MIN));
+        lazy.resize(4 * (MAX - MIN));
+        init(1, MIN, MAX, data);
+    }
+    T query(int start, int end) { return query(1, MIN, MAX, start, end); }
+    void update(int start, int end, T value) { update(1, MIN, MAX, start, end, value); }
+};
 
-int main()
-{
-	int n, m, k;
-	scanf("%d %d %d", &n, &m, &k);
-
-	int leaf_idx;
-	for(leaf_idx=1; leaf_idx<n; leaf_idx*=2);
-
-	for(int i=leaf_idx; i<leaf_idx+n; i++)
-		scanf("%d", &tree[i]);
-
-	// Fill the segment tree
-	for(int i=leaf_idx-1; i>=1; i--)
-		tree[i] = tree[i*2] + tree[i*2+1];
-
-
-
-	return 0;
+int main() {
+	ios::sync_with_stdio(false), cin.tie(nullptr);
+	int N, M, K;
+	cin >> N >> M >> K;
+	vector<long long> data(N);
+	for(int i=0; i<N; i++)
+		cin >> data[i];
+	SegTree<long long> st(data);
+	for(int i=0; i<M+K; i++) {
+		int cmd;
+		cin >> cmd;
+		if(cmd == 1) {
+			int b, c; long long d;
+			cin >> b >> c >> d;
+			st.update(b-1, c-1, d);
+		} else {
+			int b, c;
+			cin >> b >> c;
+			cout << st.query(b-1, c-1) << '\n';
+		}
+	}
 }
