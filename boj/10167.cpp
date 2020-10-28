@@ -12,8 +12,8 @@ struct Point {
     }
 };
 
-const int MAX_I = 12000;
-ll sum[MAX_I], lmax[MAX_I], rmax[MAX_I], tmax[MAX_I];
+const int TREE_SIZE = 12000;
+ll sum[TREE_SIZE], lmax[TREE_SIZE], rmax[TREE_SIZE], tmax[TREE_SIZE];
 
 void update(int i, int tl, int tr, int q, int v) {
     if(q < tl || tr < q)
@@ -79,10 +79,10 @@ int main() {
                 answer = max(answer, tmax[1]);
         }
 
-        fill_n(sum, MAX_I, 0LL);
-        fill_n(lmax, MAX_I, 0LL);
-        fill_n(rmax, MAX_I, 0LL);
-        fill_n(tmax, MAX_I, 0LL);
+        fill_n(sum, TREE_SIZE, 0LL);
+        fill_n(lmax, TREE_SIZE, 0LL);
+        fill_n(rmax, TREE_SIZE, 0LL);
+        fill_n(tmax, TREE_SIZE, 0LL);
     }
 
     cout << answer;
