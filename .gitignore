@@ -1,4 +1,3 @@
 .vscode
+*.in
 *.exe
-input
-output
