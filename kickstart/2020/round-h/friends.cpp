@@ -51,6 +51,13 @@ int main() {
             for(char c : S[i]) {
                 checked[c-'A'] = true;
             }
+            for(char c1 : S[i]) {
+                for(char c2 : S[i]) {
+                    if(c1 != c2) {
+                        adj[c1-'A'][c2-'A'] = adj[c2-'A'][c1-'A'] = 1;
+                    }
+                }
+            }
         }
 
         for (int k = 0; k < 26; k++) {
@@ -65,10 +72,6 @@ int main() {
         for (int q = 1; q <= Q; q++) {
             int X, Y;
             cin >> X >> Y;
-            if(X == Y) {
-                cout << "1 ";
-                continue;
-            }
             int dist = get_dist(S[X], S[Y], adj);
             cout << (dist != INF ? (dist + 2) : -1) << ' ';
         }
