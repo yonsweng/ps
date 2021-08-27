@@ -1,81 +1,69 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+#define MAX_N 100000
+#define MAX_K 100
 
 using namespace std;
 
-const int MAXN = 1000, INF = 200000001;
-int N, K, v[MAXN];
-vector<int> a[MAXN];
-map<int, int> d[MAXN][2];  // (n, v)
+int N, K;
+int values[MAX_N], parents[MAX_N];
+vector<int> adj[MAX_N];
+int d[MAX_N][MAX_K+1][2];
 
-void insert(map<int, int> &m, int key, int value) {
-    if (m.find(key) != m.end())
-        m[key] = max(m[key], value);
-    else
-        m[key] = value;
-}
+int dp(int cur) {
+    int n_nodes = 1;
+    d[cur][1][1] = values[cur];
 
-void tree_dp(int i) {
-    d[i][1][1] = v[i];
-    for (int c : a[i]) {
-        tree_dp(c);
+    for(int next : adj[cur]) {
+        int n_next = dp(next);
+        n_nodes += n_next;
 
-        map<int, int> tmp0;
-        for (auto dc : d[c][0])
-            insert(tmp0, dc.first, dc.second);
-        for (auto dc : d[c][1])
-            insert(tmp0, dc.first, dc.second);
-        for (auto di : d[i][0]) {
-            for (auto dc : d[c][0])
-                if (di.first + dc.first <= K)
-                    insert(tmp0, di.first + dc.first, di.second + dc.second);
-                else
-                    break;
-            for (auto dc : d[c][1])
-                if (di.first + dc.first <= K)
-                    insert(tmp0, di.first + dc.first, di.second + dc.second);
-                else
-                    break;
+        for(int k=min(K, n_nodes); k>0; k--) {
+            for(int j=0; j<=k; j++)
+                d[cur][k][0] = max(d[cur][k][0], d[cur][k-j][0] + max(d[next][j][0], d[next][j][1]));
+            for(int j=0; j<k; j++)
+                d[cur][k][1] = max(d[cur][k][1], d[cur][k-j][1] + d[next][j][0]);
         }
-        for (auto kv : tmp0)
-            insert(d[i][0], kv.first, kv.second);
-
-        map<int, int> tmp1;
-        for (auto di : d[i][1])
-            for (auto dc : d[c][0])
-                if (di.first + dc.first <= K)
-                    insert(tmp1, di.first + dc.first, di.second + dc.second);
-                else
-                    break;
-        for (auto kv : tmp1)
-            insert(d[i][1], kv.first, kv.second);
     }
+
+    return n_nodes;
 }
 
 int main() {
-    freopen("1.in", "r", stdin);
     ios::sync_with_stdio(false), cin.tie(NULL);
 
     int T;
     cin >> T;
+
     while (T--) {
         cin >> N >> K;
-        for (int i = 0; i < N; i++) {
-            cin >> v[i];
-            a[i].clear();
-            d[i][0].clear();
-            d[i][1].clear();
+        for(int i=0; i<N; i++) cin >> values[i];
+        for(int i=1; i<N; i++) cin >> parents[i];
+
+        // init
+        for(int i=0; i<N; i++)
+            adj[i].clear();
+        for(int i=0; i<N; i++)
+            for(int j=0; j<=K; j++)
+                d[i][j][0] = d[i][j][1] = 0;
+
+        int max_value = *max_element(values, values + N);
+        if(max_value <= 0) {
+            cout << max_value << '\n';
+            continue;
         }
-        for (int i = 1; i < N; i++) {
-            int p;
-            cin >> p;
-            a[p].push_back(i);
-        }
-        tree_dp(0);
-        int answer = -INF;
-        for (auto kv : d[0][0])
-            answer = max(answer, kv.second);
-        for (auto kv : d[0][1])
-            answer = max(answer, kv.second);
+
+        for(int child=1; child<N; child++)
+            adj[parents[child]].push_back(child);
+
+        dp(0);
+
+        int answer = 0;
+        for(int i=0; i<=K; i++)
+            answer = max(answer, max(d[0][i][0], d[0][i][1]));
+
         cout << answer << '\n';
     }
 }
