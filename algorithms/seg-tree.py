@@ -2,46 +2,37 @@ class SegTree:
     def __init__(self, data):
         self.data = data
         self.tree = [0] * (4 * len(self.data))
-
         self.init(1, 0, len(self.data) - 1)
 
-    def init(self, index, tree_left, tree_right):
-        if tree_left == tree_right:
-            self.tree[index] = self.data[tree_left]
-            return self.tree[index]
+    def init(self, ti, l, r):
+        if l == r:
+            self.tree[ti] = self.data[l]
+            return self.tree[ti]
+        self.tree[ti] = self.init(ti * 2, l, (l + r) // 2) \
+            + self.init(ti * 2 + 1, (l + r) // 2 + 1, r)
+        return self.tree[ti]
 
-        self.tree[index] = self.init(index * 2, tree_left, (tree_left + tree_right) // 2) \
-            + self.init(index * 2 + 1, (tree_left + tree_right) // 2 + 1, tree_right)
+    def __update__(self, ti, di, elt, l, r):
+        if di < l or r < di:
+            return self.tree[ti]
+        if l == r:
+            self.tree[ti] = elt
+            return self.tree[ti]
+        self.tree[ti] = self.__update__(ti * 2, di, elt, l, (l + r) // 2) \
+            + self.__update__(ti * 2 + 1, di, elt, (l + r) // 2 + 1, r)
+        return self.tree[ti]
 
-        return self.tree[index]
-
-    def __update__(self, index, data_index, element, tree_left, tree_right):
-        if tree_left == tree_right:
-            self.tree[index] = element
-            return self.tree[index]
-
-        if data_index < tree_left or tree_right < data_index:
-            return self.tree[index]
-
-        self.tree[index] = \
-            self.__update__(index * 2, data_index, element, tree_left, (tree_left + tree_right) // 2) + \
-            self.__update__(index * 2 + 1, data_index, element, (tree_left + tree_right) // 2 + 1, tree_right)
-
-        return self.tree[index]
-
-    def __query__(self, index, query_left, query_right, tree_left, tree_right):
-        if query_left <= tree_left and tree_right <= query_right:
-            return self.tree[index]
-
-        if tree_right < query_left or query_right < tree_left:
+    def __query__(self, ti, ql, qr, tl, tr):
+        if ql <= tl and tr <= qr:
+            return self.tree[ti]
+        if tr < ql or qr < tl:
             return 0
+        return self.__query__(ti * 2, ql, qr, tl, (tl + tr) // 2) \
+            + self.__query__(ti * 2 + 1, ql, qr, (tl + tr) // 2 + 1, tr)
 
-        return self.__query__(index * 2, query_left, query_right, tree_left, (tree_left + tree_right) // 2) + \
-            self.__query__(index * 2 + 1, query_left, query_right, (tree_left + tree_right) // 2 + 1, tree_right)
+    def update(self, idx, elt):
+        self.__update__(1, idx, elt, 0, len(self.data) - 1)
 
-    def update(self, data_index, element):
-        self.__update__(1, data_index, element, 0, len(self.data) - 1)
-    
     def query(self, left, right):
         return self.__query__(1, left, right, 0, len(self.data) - 1)
 
@@ -51,7 +42,10 @@ def main():
 
     print(st.query(4, 8))
     st.update(2, 1)
+    st.update(5, 3)
+    st.update(6, 10)
     print(st.query(2, 3))
+    print(st.query(0, 6))
 
 
 if __name__ == '__main__':
