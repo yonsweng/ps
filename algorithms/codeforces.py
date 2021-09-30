@@ -19,8 +19,8 @@ def main():
     t = int(stdin.readline())
 
     for _ in range(t):
-        a, b, c, d, e, f, g = read_input()
-        answer = solve(a, b, c, d, e, f, g)
+        input = read_input()
+        answer = solve(*input)
         print(answer)
 
 
