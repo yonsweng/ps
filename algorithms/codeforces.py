@@ -10,8 +10,18 @@ def read_input():
     return a, b, c, d, e, f, g
 
 
+def solve(a, b, c, d, e, f, g):
+    answer = 0
+    return answer
+
+
 def main():
-    a, b, c, d, e, f, g = read_input()
+    t = int(stdin.readline())
+
+    for _ in range(t):
+        a, b, c, d, e, f, g = read_input()
+        answer = solve(a, b, c, d, e, f, g)
+        print(answer)
 
 
 if __name__ == '__main__':
