@@ -2,3 +2,6 @@
 input
 output
 *.exe
+input.txt
+a.out
+*.dSYM
