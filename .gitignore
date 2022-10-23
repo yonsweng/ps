@@ -8,3 +8,6 @@ a.out
 
 # Python
 /venv/
+
+# Node.js
+/node_modules/
