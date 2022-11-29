@@ -8,6 +8,7 @@ a.out
 
 # Python
 /venv/
+/.flake8
 
 # Node.js
 /node_modules/
