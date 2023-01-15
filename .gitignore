@@ -12,3 +12,6 @@ a.out
 
 # Node.js
 /node_modules/
+
+# Go
+__debug_bin
