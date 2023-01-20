@@ -21,8 +21,11 @@ func max(a int, b int) int {
 }
 
 func main() {
-	var name string
 	in := bufio.NewReader(os.Stdin)
+	out := bufio.NewWriter(os.Stdout)
+	defer out.Flush()
+
+	var name string
 	fmt.Fscan(in, &name)
-	fmt.Printf("Hello, %s!", name)
+	fmt.Fprintf(out, "Hello, %s!\n", name)
 }
