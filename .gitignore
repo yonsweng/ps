@@ -1,17 +1,4 @@
 .vscode
-input
-output
-*.exe
-input.txt
-a.out
-*.dSYM
 
 # Python
 /venv/
-/.flake8
-
-# Node.js
-/node_modules/
-
-# Go
-__debug_bin
