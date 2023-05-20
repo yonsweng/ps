@@ -2,7 +2,8 @@ from sys import stdin
 
 
 def main():
-    n = stdin.readline()
+    n = int(stdin.readline())
+    a = list(map(int, stdin.readline().split()))
 
 
 if __name__ == "__main__":
