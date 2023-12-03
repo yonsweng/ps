@@ -15,7 +15,7 @@ def main():
             j = int(j)
             r = bisect_left(p[j], k)
             if r < len(p[j]):
-                k = p[j][r]
+                k = p[j][r] + 1
             else:
                 fail = True
                 break
