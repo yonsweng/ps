@@ -1,27 +1,46 @@
 from sys import stdin
-from bisect import bisect_left
 
 
 def main():
-    n = stdin.readline().rstrip()
-    p = [[] for _ in range(10)]
-    for i, ni in enumerate(n):
-        p[int(ni)].append(i)
+    n = list(map(int, stdin.readline().rstrip()))
 
-    fail = False
-    for i in range(1, 10**8):
-        k = 0
-        for j in str(i):
-            j = int(j)
-            r = bisect_left(p[j], k)
-            if r < len(p[j]):
-                k = p[j][r] + 1
-            else:
-                fail = True
-                break
-        if fail:
+    length = len(n)
+
+    dp = [0] * length + [-1]
+    min_j = [[length] * 10 for _ in range(length)]
+
+    for i in range(length - 2, -1, -1):
+        min_j[i][:] = min_j[i + 1][:]
+        min_j[i][n[i + 1]] = i + 1
+
+        dp[i] = min(dp[min_j[i][k]] for k in range(10)) + 1
+
+    answers = []
+
+    for first in range(1, 10):
+        i = 0
+        while i < length and n[i] != first:
+            i += 1
+        if i == length:
+            answers.append(str(first))
             break
-    print(i)
+
+        answer = [first]
+
+        while i < length:
+            min_dp = min(dp[min_j[i][k]] for k in range(10))
+            next_i = length
+            for k in range(10):
+                if dp[min_j[i][k]] == min_dp:
+                    next_i = min_j[i][k]
+                    answer.append(k)
+                    break
+            i = next_i
+
+        answer = "".join(map(str, answer))
+        answers.append(answer)
+
+    print(min(answers, key=lambda x: (len(x), x)))
 
 
 if __name__ == "__main__":
