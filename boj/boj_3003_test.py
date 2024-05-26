@@ -1,6 +1,6 @@
 import io, sys
 import pytest
-from boj_3003 import solve
+from .boj_3003 import solve
 
 
 @pytest.mark.parametrize(

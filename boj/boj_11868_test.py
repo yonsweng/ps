@@ -2,7 +2,7 @@ import io
 import sys
 
 import pytest
-from boj_11868 import main
+from .boj_11868 import main
 
 
 @pytest.mark.parametrize(
