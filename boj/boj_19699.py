@@ -17,7 +17,7 @@ def find_prime_sums(H, total, i, count):
         if is_prime(total):
             answer.add(total)
     if i >= len(H):
-        return False
+        return
     find_prime_sums(H, total, i + 1, count)
     find_prime_sums(H, total + H[i], i + 1, count - 1)
 
