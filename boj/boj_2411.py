@@ -15,7 +15,12 @@ def solve():
     items.sort(key=lambda x: x[0] + x[1])
 
     for i in range(1, A):
-        if items[i - 1][0] + items[i - 1][1] == items[i][0] + items[i][1] and items[i - 1][0] != items[i][0]:
+        # Calculate the diagonal sums for the current and previous items
+        prev_diagonal_sum = items[i - 1][0] + items[i - 1][1]
+        curr_diagonal_sum = items[i][0] + items[i][1]
+        
+        # Check if the current and previous items are on the same diagonal but not in the same row
+        if prev_diagonal_sum == curr_diagonal_sum and items[i - 1][0] != items[i][0]:
             print(0)
             return
         
