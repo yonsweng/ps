@@ -2,6 +2,23 @@ from sys import stdin
 
 
 def solve():
+    """
+    Solves a cost minimization problem involving two types of transportation: truck and helicopter.
+
+    Input (read from stdin):
+        - First line: integer N, the number of delivery locations.
+        - Second line: N space-separated integers, the positions of the delivery locations.
+        - Third line: two integers, truck and heli, representing the cost per unit distance for truck and the fixed cost for helicopter, respectively.
+
+    Algorithm:
+        - Uses dynamic programming to compute the minimum cost to deliver to all locations, considering two options at each step:
+            1. Deliver using only trucks.
+            2. Use a helicopter for the last segment.
+        - Maintains cumulative position sums and cost tables for both options.
+
+    Output:
+        - Prints the minimum total cost to deliver to all locations.
+    """
     N = int(stdin.readline().strip())
     pos = [0] + list(map(int, stdin.readline().strip().split()))
     truck, heli = map(int, stdin.readline().strip().split())
