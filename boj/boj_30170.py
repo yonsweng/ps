@@ -20,6 +20,9 @@ def solve():
         else:
             group[j] = 1
 
+    if v2 == 0:
+        print(-1)
+        return
     for j in range(v2, n + 1):
         if j in adj[v2]:
             if v3 == 0 and group[j] != 1:
