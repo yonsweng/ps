@@ -37,6 +37,9 @@ def solve():
         print(-1)
         return
     
+    if v3 == 0:
+        print(-1)
+        return
     for j in range(v3, n + 1):
         if j in adj[v3]:
             if group[j] != 1 and group[j] != 2:
