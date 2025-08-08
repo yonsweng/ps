@@ -1,5 +1,6 @@
 .vscode
 .DS_Store
+.cph/
 
 # Python
 __pycache__/
