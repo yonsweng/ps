@@ -17,16 +17,16 @@ def solve():
         seq = list(map(int, stdin.readline().strip().split()))
 
         root = TreeNode(seq[0])
-        nodes, first_leaf = [root], -1
+        nodes, parent_index = [root], -1
         for i in range(1, n):
             node = TreeNode(seq[i])
             if seq[i - 1] + 1 == seq[i]:
-                nodes[first_leaf].children.append(node)
-                node.parent = nodes[first_leaf]
+                nodes[parent_index].children.append(node)
+                node.parent = nodes[parent_index]
             else:
-                first_leaf += 1
-                nodes[first_leaf].children.append(node)
-                node.parent = nodes[first_leaf]
+                parent_index += 1
+                nodes[parent_index].children.append(node)
+                node.parent = nodes[parent_index]
             nodes.append(node)
 
         # Find the node with value k
